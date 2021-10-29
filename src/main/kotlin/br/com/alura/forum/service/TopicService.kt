@@ -4,6 +4,8 @@ import br.com.alura.forum.domain.Topic
 import br.com.alura.forum.dto.DTopicRequest
 import br.com.alura.forum.dto.DTopicResponse
 import br.com.alura.forum.dto.DTopicUpdate
+import br.com.alura.forum.enum.ErrorMessage
+import br.com.alura.forum.exception.NotFoundException
 import br.com.alura.forum.mapper.TopicMapper
 import org.springframework.stereotype.Service
 import java.util.stream.Collectors
@@ -17,7 +19,7 @@ class TopicService(private var topics: List<Topic> = ArrayList(),
     }
 
     fun findById(id: Long): DTopicResponse {
-        val topic =  topics.stream().filter { t -> t.id == id }.findFirst().get()
+        val topic =  topics.stream().filter { t -> t.id == id }.findFirst().orElseThrow{NotFoundException(ErrorMessage.NOT_FOUND.message)}
         return topicMapper.map(topic)
     }
 
@@ -29,7 +31,7 @@ class TopicService(private var topics: List<Topic> = ArrayList(),
     }
 
     fun update(topicRequest: DTopicUpdate): DTopicResponse {
-        val topic =  topics.stream().filter { t -> t.id == topicRequest.id }.findFirst().get()
+        val topic =  topics.stream().filter { t -> t.id == topicRequest.id }.findFirst().orElseThrow{NotFoundException(ErrorMessage.NOT_FOUND.message)}
         val newTopic = Topic(
             id = topicRequest.id,
             title = topicRequest.title,
@@ -45,7 +47,7 @@ class TopicService(private var topics: List<Topic> = ArrayList(),
     }
 
     fun delete(id: Long){
-        val topic =  topics.stream().filter { t -> t.id == id }.findFirst().get()
+        val topic =  topics.stream().filter { t -> t.id == id }.findFirst().orElseThrow{NotFoundException(ErrorMessage.NOT_FOUND.message)}
         topics = topics.minus(topic)
     }
 }
