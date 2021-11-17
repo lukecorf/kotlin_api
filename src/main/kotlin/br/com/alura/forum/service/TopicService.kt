@@ -7,47 +7,38 @@ import br.com.alura.forum.dto.DTopicUpdate
 import br.com.alura.forum.enum.ErrorMessage
 import br.com.alura.forum.exception.NotFoundException
 import br.com.alura.forum.mapper.TopicMapper
+import br.com.alura.forum.repository.TopicRepository
 import org.springframework.stereotype.Service
 import java.util.stream.Collectors
 
 @Service
-class TopicService(private var topics: List<Topic> = ArrayList(),
+class TopicService(private val repository: TopicRepository,
                    private val topicMapper: TopicMapper ) {
 
     fun findAll(): List<DTopicResponse> {
-        return topics.stream().map { t -> topicMapper.map(t) }.collect(Collectors.toList());
+        return repository.findAll().stream().map { t -> topicMapper.map(t) }.collect(Collectors.toList());
     }
 
     fun findById(id: Long): DTopicResponse {
-        val topic =  topics.stream().filter { t -> t.id == id }.findFirst().orElseThrow{NotFoundException(ErrorMessage.NOT_FOUND.message)}
+        val topic =  repository.findById(id).orElseThrow{NotFoundException(ErrorMessage.NOT_FOUND.message)}
         return topicMapper.map(topic)
     }
 
     fun insert(topicRequest: DTopicRequest): DTopicResponse{
-        val topic = topicMapper.mapEntity(topicRequest)
-        topic.id = topics.size.toLong()+1
-        topics = topics.plus(topic)
+        var topic = topicMapper.mapEntity(topicRequest)
+        topic = repository.save(topic)
         return topicMapper.map(topic)
     }
 
     fun update(topicRequest: DTopicUpdate): DTopicResponse {
-        val topic =  topics.stream().filter { t -> t.id == topicRequest.id }.findFirst().orElseThrow{NotFoundException(ErrorMessage.NOT_FOUND.message)}
-        val newTopic = Topic(
-            id = topicRequest.id,
-            title = topicRequest.title,
-            message = topicRequest.message,
-            author = topic.author,
-            course = topic.course,
-            answers = topic.answers,
-            status = topic.status,
-            creationDate = topic.creationDate
-        )
-        topics = topics.minus(topic).plus(newTopic)
-        return topicMapper.map(newTopic)
+        var topic =  repository.findById(topicRequest.id).orElseThrow{NotFoundException(ErrorMessage.NOT_FOUND.message)}
+        topic.title = topicRequest.title
+        topic.message = topicRequest.message
+        topic = repository.save(topic)
+        return topicMapper.map(topic)
     }
 
     fun delete(id: Long){
-        val topic =  topics.stream().filter { t -> t.id == id }.findFirst().orElseThrow{NotFoundException(ErrorMessage.NOT_FOUND.message)}
-        topics = topics.minus(topic)
+        repository.deleteById(id);
     }
 }
