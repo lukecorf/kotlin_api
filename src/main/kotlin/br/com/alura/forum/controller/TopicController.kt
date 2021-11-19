@@ -1,9 +1,16 @@
 package br.com.alura.forum.controller
 
+import br.com.alura.forum.dto.DTopicReport
 import br.com.alura.forum.dto.DTopicRequest
 import br.com.alura.forum.dto.DTopicResponse
 import br.com.alura.forum.dto.DTopicUpdate
 import br.com.alura.forum.service.TopicService
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -16,8 +23,13 @@ import javax.validation.Valid
 class TopicController(private val service: TopicService) {
 
     @GetMapping
-    fun list (): List<DTopicResponse> {
-        return service.findAll()
+    @Cacheable("topics")
+    fun list (@RequestParam(required = false) courseName: String?, @PageableDefault(size = 5, sort = ["creationDate"], direction = Sort.Direction.DESC) pagination: Pageable): Page<DTopicResponse> {
+        return service.findAll(courseName,pagination)
+    }
+    @GetMapping("/reports")
+    fun report (): List<DTopicReport> {
+        return service.report()
     }
 
     @GetMapping("/{id}")
@@ -27,6 +39,7 @@ class TopicController(private val service: TopicService) {
 
     @PostMapping
     @Transactional
+    @CacheEvict(value = ["topics"], allEntries = true)
     fun insert(@RequestBody @Valid topicRequest: DTopicRequest, uriBuilder: UriComponentsBuilder) : ResponseEntity<DTopicResponse>{
         val topicResponse = service.insert(topicRequest)
         val uri = uriBuilder.path("/topic/${topicResponse.id}").build().toUri()
@@ -35,6 +48,7 @@ class TopicController(private val service: TopicService) {
 
     @PutMapping
     @Transactional
+    @CacheEvict(value = ["topics"], allEntries = true)
     fun update(@RequestBody @Valid topicRequest: DTopicUpdate ) : ResponseEntity<DTopicResponse>{
         val topicResponse = service.update(topicRequest)
         return ResponseEntity.ok(topicResponse)
@@ -42,6 +56,7 @@ class TopicController(private val service: TopicService) {
 
     @DeleteMapping("/{id}")
     @Transactional
+    @CacheEvict(value = ["topics"], allEntries = true)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable id: Long) {
         service.delete(id)
