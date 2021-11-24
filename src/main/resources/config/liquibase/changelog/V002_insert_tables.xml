@@ -17,6 +17,31 @@
             <column  name="ID"  valueComputed="SEQ_USER.NEXTVAL"/>
             <column  name="NAME"  value="Jhon Doe"/>
             <column  name="EMAIL"  value="jhondoe@email.com"/>
+            <column  name="PASSWORD"  value="$2a$12$/f/HOmIO8sDUQcVNfmQifeXU3hGq7Z88M.6kQZS1BBTcRlO4pwDpu"/>
+        </insert>
+        <insert tableName="ROLES">
+            <column  name="ID"  valueComputed="SEQ_ROLES.NEXTVAL"/>
+            <column  name="NAME"  value="RULE_TOPICS_LIST"/>
+        </insert>
+        <insert tableName="ROLES">
+            <column  name="ID"  valueComputed="SEQ_ROLES.NEXTVAL"/>
+            <column  name="NAME"  value="RULE_TOPICS_SAVE"/>
+        </insert>
+        <insert tableName="ROLES">
+            <column  name="ID"  valueComputed="SEQ_ROLES.NEXTVAL"/>
+            <column  name="NAME"  value="RULE_TOPICS_DELETE"/>
+        </insert>
+        <insert tableName="USERS_ROLES">
+            <column  name="ROLES_ID"  value="1"/>
+            <column  name="USERS_ID"  value="1"/>
+        </insert>
+        <insert tableName="USERS_ROLES">
+            <column  name="ROLES_ID"  value="2"/>
+            <column  name="USERS_ID"  value="1"/>
+        </insert>
+        <insert tableName="USERS_ROLES">
+            <column  name="ROLES_ID"  value="3"/>
+            <column  name="USERS_ID"  value="1"/>
         </insert>
     </changeSet>
 

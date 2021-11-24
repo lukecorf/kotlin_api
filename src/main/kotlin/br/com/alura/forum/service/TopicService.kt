@@ -1,6 +1,7 @@
 package br.com.alura.forum.service
 
 
+import br.com.alura.forum.domain.Roles
 import br.com.alura.forum.dto.DTopicReport
 import br.com.alura.forum.dto.DTopicRequest
 import br.com.alura.forum.dto.DTopicResponse
@@ -16,7 +17,8 @@ import java.util.stream.Collectors
 
 @Service
 class TopicService(private val repository: TopicRepository,
-                   private val topicMapper: TopicMapper ) {
+                   private val topicMapper: TopicMapper,
+                   private val userService: UserService) {
 
     fun findAll(courseName: String?, pagination: Pageable): Page<DTopicResponse> {
         val topics = if(courseName == null) {
@@ -52,5 +54,9 @@ class TopicService(private val repository: TopicRepository,
 
     fun report(): List<DTopicReport> {
         return repository.report()
+    }
+
+    fun getRoles(id: Long): List<Roles> {
+        return userService.findById(id).roles
     }
 }
