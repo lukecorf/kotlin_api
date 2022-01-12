@@ -9,3 +9,8 @@ To develop this software I used:
 - JPA
 - Liquibase
 - Spring Boot
+
+Run project with Docker:
+
+####Build: *docker build -t forum -f Dockerfile .*
+####Run: *docker run -p 3080:8080 forum*
